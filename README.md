@@ -44,12 +44,88 @@ sudo chown -R $USER:$USER /var/www/html/desafio_final
 sudo chmod -R 755 /var/www/html/desafio_final
 ```
 
-## 6. Criar arquivos básicos
+## 6. Criar database, usuário e senha, e conceder permissoes
+```
+sudo mariadb
+CREATE DATABASE desafio;
+CREATE USER 'sisd'@'localhost' IDENTIFIED BY 'senha';
+GRANT ALL PRIVILEGES ON desafio.* TO 'sisd'@'localhost';
+EXIT;
+```
+
+## 7. Criar estrutura de arquivos
 ```
 cd /var/www/html/desafio_final
-echo "" > index.php
-echo "body { font-family: Arial, sans-serif; }" > style.css
+sudo nano index.php
 ```
+Dentro do arquivo PHP adicone:
+```
+<?php
+echo "Desafio Final LAMP funcionando!";
+?>
+```
+
+## 8. Configurar conexão com banco
+```
+sudo nano conexao.php
+```
+Dentro do arquivo PHP adicone:
+```
+<?php
+$servername = "localhost";
+$username = "sisd";
+$password = "senha";
+$dbname = "desafio";
+
+$conn = new mysqli($servername, $username, $password, $dbname);
+
+if ($conn->connect_error) {
+  die("Conexão falhou: " . $conn->connect_error);
+}
+echo "Conexão bem-sucedida!";
+?>
+```
+
+## 9. Criar tabelas do banco
+```
+sudo mariadb
+USE desafio;
+CREATE TABLE  clientes (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  nome VARCHAR(100) NOT NULL,
+  email VARCHAR(100) NOT NULL,
+  telefone VARCHAR(20)
+);
+EXIT;
+```
+
+## 10. Testar inserção e leitura de dados
+```
+sudo nano teste_db.php
+```
+Dentro do arquivo PHP adicone:
+```
+<?php
+include 'conexao.php';
+
+$sql = "INSERT INTO clientes (nome, email, telefone) VALUES ('Viória', 'vitoria@gmail.com', '11999999999')";
+
+if ($conn->query($sql) === TRUE) {
+  echo "Novo registro inserido com sucesso";
+} else {
+  echo "Erro: " . $sql . "<br>" . $conn->error;
+}
+
+$conn->close();
+?>
+```
+
+## 11. Finalizando
+Sempre que criar ou editar PHP, reinicie o Apache:
+```
+sudo systemctl restart apache2
+```
+
 ## Observações e diferenças entre Amazon Linux e Ubuntu Server
 
 - Gerenciador de pacotes:  
