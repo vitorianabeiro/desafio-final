@@ -33,6 +33,7 @@ sudo mysql_secure_installation
 ```
 sudo apt install php libapache2-mod-php php-mysql -y
 php -v
+sudo apt install phpmyadmin -y
 ```
 > Amazon Linux: sudo dnf install php php-mysqlnd -y
 > sudo systemctl restart httpd
