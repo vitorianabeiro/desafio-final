@@ -1,36 +1,65 @@
-<?php include 'conexao.php'; ?>
+<?php
+include 'conexao.php'; // conexão com o banco
+?>
 
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>Lista de Usuários</title>
+    <title>Cadastro de Usuários</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>Usuários</h1>
-    <a href="create.php">Adicionar Usuário</a>
-    <table border="1" cellpadding="8">
-        <tr>
-            <th>ID</th>
-            <th>Nome</th>
-            <th>Email</th>
-            <th>Ações</th>
-        </tr>
+    <h1>Cadastro de Usuários</h1>
+
+    <!-- Formulário em HTML -->
+    <form action="index.php" method="POST">
+        <label for="nome">Nome:</label><br>
+        <input type="text" id="nome" name="nome" required><br><br>
+
+        <label for="email">E-mail:</label><br>
+        <input type="email" id="email" name="email" required><br><br>
+
+        <button type="submit" name="cadastrar">Cadastrar</button>
+    </form>
+
+    <hr>
+
+    <!-- Aqui listamos os usuários cadastrados -->
+    <h2>Usuários cadastrados</h2>
+    <ul>
         <?php
-        $sql = "SELECT * FROM clientes";
-        $result = $conn->query($sql);
-        while($row = $result->fetch_assoc()) {
-            echo "<tr>
-                    <td>{$row['id']}</td>
-                    <td>{$row['nome']}</td>
-                    <td>{$row['email']}</td>
-                    <td>
-                        <a href='update.php?id={$row['id']}'>Editar</a> | 
-                        <a href='delete.php?id={$row['id']}'>Excluir</a>
-                    </td>
-                  </tr>";
+        // Exibe registros já salvos
+        $sql = "SELECT nome, email FROM clientes ORDER BY id DESC";
+        $resultado = $conn->query($sql);
+
+        if ($resultado->num_rows > 0) {
+            while ($row = $resultado->fetch_assoc()) {
+                echo "<li>" . $row['nome'] . " - " . $row['email'] . "</li>";
+            }
+        } else {
+            echo "<li>Nenhum cliente cadastrado ainda.</li>";
         }
         ?>
-    </table>
+    </ul>
+
 </body>
 </html>
+
+<?php
+// Processa os dados enviados pelo formulário
+if (isset($_POST['cadastrar'])) {
+    $nome = $_POST['nome'];
+    $email = $_POST['email'];
+
+    $sql = "INSERT INTO clientes (nome, email) VALUES ('$nome', '$email')";
+    
+    if ($conn->query($sql) === TRUE) {
+        echo "<p>Cadastro realizado com sucesso!</p>";
+        // recarrega a página para mostrar o novo usuário
+        header("Refresh:0");
+    } else {
+        echo "<p>Erro: " . $conn->error . "</p>";
+    }
+}
+?>
